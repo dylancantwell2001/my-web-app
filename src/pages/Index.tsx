@@ -48,6 +48,22 @@ const Index = () => {
       return;
     }
 
+    // Calculate total task duration and available time
+    const totalTaskDuration = tasks.reduce((sum, task) => sum + task.duration, 0);
+    const availableTime = endMinutes - startMinutes;
+
+    if (totalTaskDuration > availableTime) {
+      const hoursNeeded = Math.floor(totalTaskDuration / 60);
+      const minutesNeeded = totalTaskDuration % 60;
+      const hoursAvailable = Math.floor(availableTime / 60);
+      const minutesAvailable = availableTime % 60;
+
+      toast.error(
+        `Tasks are too long! You need ${hoursNeeded}h ${minutesNeeded}m but only have ${hoursAvailable}h ${minutesAvailable}m available.`
+      );
+      return;
+    }
+
     setIsShuffling(true);
 
     // Add a small delay for the animation effect
@@ -64,6 +80,18 @@ const Index = () => {
     downloadICS(schedule);
     toast.success("Calendar exported! 📅");
   }, [schedule]);
+
+  const handleRegenerate = useCallback(() => {
+    if (tasks.length === 0) return;
+
+    setIsShuffling(true);
+    setTimeout(() => {
+      const newSchedule = generateSchedule(tasks, startTime, endTime);
+      setSchedule(newSchedule);
+      setIsShuffling(false);
+      toast.success("Schedule reshuffled! 🎲");
+    }, 600);
+  }, [tasks, startTime, endTime]);
 
   const canShuffle = tasks.length > 0;
 
@@ -92,7 +120,10 @@ const Index = () => {
           </div>
 
           {schedule.length > 0 && (
-            <ScheduleDisplay schedule={schedule} onExport={handleExport} />
+            <ScheduleDisplay
+              schedule={schedule}
+              onExport={handleExport}
+            />
           )}
 
         </div>

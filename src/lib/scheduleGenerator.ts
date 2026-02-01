@@ -37,46 +37,57 @@ export function generateSchedule(
 
   if (totalMinutes <= 0) return [];
 
-  // Shuffle the tasks
-  const shuffledTasks = shuffle(tasks);
+  // PRD Algorithm: Separate outdoor and indoor tasks
+  const outdoorTasks = tasks.filter(t => t.isOutside);
+  const indoorTasks = tasks.filter(t => !t.isOutside);
 
-  // Calculate total requested duration
-  const totalRequestedDuration = shuffledTasks.reduce((sum, task) => sum + task.duration, 0);
-  
-  // Scale factor if tasks don't fit exactly
-  const scaleFactor = totalMinutes / totalRequestedDuration;
+  // Shuffle each group independently
+  const shuffledOutdoor = shuffle(outdoorTasks);
+  const shuffledIndoor = shuffle(indoorTasks);
+
+  // Group consecutive outdoor tasks together and interleave with indoor
+  const interleavedTasks: Task[] = [];
+  let outdoorIndex = 0;
+  let indoorIndex = 0;
+
+  while (outdoorIndex < shuffledOutdoor.length || indoorIndex < shuffledIndoor.length) {
+    // Add an indoor task if available
+    if (indoorIndex < shuffledIndoor.length) {
+      interleavedTasks.push(shuffledIndoor[indoorIndex++]);
+    }
+
+    // Add a group of outdoor tasks (1-3 tasks grouped together)
+    if (outdoorIndex < shuffledOutdoor.length) {
+      const groupSize = Math.min(
+        Math.floor(Math.random() * 3) + 1, // Random 1-3 tasks
+        shuffledOutdoor.length - outdoorIndex
+      );
+      for (let i = 0; i < groupSize; i++) {
+        interleavedTasks.push(shuffledOutdoor[outdoorIndex++]);
+      }
+    }
+  }
 
   const schedule: ScheduleItem[] = [];
   let currentTime = startMinutes;
 
-  shuffledTasks.forEach((task, index) => {
-    const isLast = index === shuffledTasks.length - 1;
-    
-    // Scale duration to fit available time
-    let duration = Math.round(task.duration * scaleFactor);
-    
-    // Minimum 5 minutes per task
-    duration = Math.max(5, duration);
-    
-    // Last task gets remaining time
-    if (isLast) {
-      duration = endMinutes - currentTime;
-    }
-    
+  interleavedTasks.forEach((task) => {
+    // Use the exact duration specified by the user
+    const duration = task.duration;
+
     // Ensure we don't exceed end time
     if (currentTime + duration > endMinutes) {
-      duration = endMinutes - currentTime;
+      // Skip this task if it doesn't fit
+      return;
     }
 
-    if (duration > 0) {
-      schedule.push({
-        task: task.name,
-        startTime: minutesToTime(currentTime),
-        endTime: minutesToTime(currentTime + duration),
-        duration,
-      });
-      currentTime += duration;
-    }
+    schedule.push({
+      task: task.name,
+      startTime: minutesToTime(currentTime),
+      endTime: minutesToTime(currentTime + duration),
+      duration,
+    });
+    currentTime += duration;
   });
 
   return schedule;
@@ -113,10 +124,14 @@ export function downloadICS(schedule: ScheduleItem[]): void {
   const icsContent = generateICS(schedule);
   const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
   const url = URL.createObjectURL(blob);
-  
+
   const link = document.createElement("a");
   link.href = url;
-  link.download = "wacky-schedule.ics";
+
+  // Generate filename with date: wacky-calendar-YYYY-MM-DD.ics
+  const today = new Date();
+  const dateStr = today.toISOString().split("T")[0]; // YYYY-MM-DD
+  link.download = `wacky-calendar-${dateStr}.ics`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
