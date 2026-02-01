@@ -20,8 +20,8 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </TooltipProvider >
+  </QueryClientProvider >
 );
 
 export default App;

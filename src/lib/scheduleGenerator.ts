@@ -24,18 +24,16 @@ function minutesToTime(minutes: number): string {
   return `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`;
 }
 
+import type { TimeWindow } from "@/components/TimeWindowPicker";
+
 export function generateSchedule(
   tasks: Task[],
-  startTime: string,
-  endTime: string
+  windows: TimeWindow[]
 ): ScheduleItem[] {
   if (tasks.length === 0) return [];
 
-  const startMinutes = timeToMinutes(startTime);
-  const endMinutes = timeToMinutes(endTime);
-  const totalMinutes = endMinutes - startMinutes;
-
-  if (totalMinutes <= 0) return [];
+  // Sort windows by start time to ensure chronological order
+  const sortedWindows = [...windows].sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
 
   // PRD Algorithm: Separate outdoor and indoor tasks
   const outdoorTasks = tasks.filter(t => t.isOutside);
@@ -69,26 +67,36 @@ export function generateSchedule(
   }
 
   const schedule: ScheduleItem[] = [];
-  let currentTime = startMinutes;
 
-  interleavedTasks.forEach((task) => {
-    // Use the exact duration specified by the user
-    const duration = task.duration;
+  let currentTaskIndex = 0;
 
-    // Ensure we don't exceed end time
-    if (currentTime + duration > endMinutes) {
-      // Skip this task if it doesn't fit
-      return;
+  // Iterate through each time window
+  for (const window of sortedWindows) {
+    let currentTime = timeToMinutes(window.startTime);
+    const windowEndMinutes = timeToMinutes(window.endTime);
+
+    // Try to fit as many tasks as possible into this window
+    while (currentTaskIndex < interleavedTasks.length) {
+      const task = interleavedTasks[currentTaskIndex];
+      const duration = task.duration;
+
+      if (currentTime + duration > windowEndMinutes) {
+        // Task doesn't fit in this window, stop and move to next window
+        // Note: In a smarter alg, we might try to find a smaller task, but for now we keep order
+        break;
+      }
+
+      schedule.push({
+        task: task.name,
+        startTime: minutesToTime(currentTime),
+        endTime: minutesToTime(currentTime + duration),
+        duration,
+      });
+
+      currentTime += duration;
+      currentTaskIndex++;
     }
-
-    schedule.push({
-      task: task.name,
-      startTime: minutesToTime(currentTime),
-      endTime: minutesToTime(currentTime + duration),
-      duration,
-    });
-    currentTime += duration;
-  });
+  }
 
   return schedule;
 }
@@ -136,4 +144,21 @@ export function downloadICS(schedule: ScheduleItem[]): void {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+}
+
+export function generateGoogleCalendarLink(item: ScheduleItem): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, "0");
+  const day = now.getDate().toString().padStart(2, "0");
+  const datePrefix = `${year}${month}${day}`;
+
+  const start = item.startTime.replace(":", "") + "00";
+  const end = item.endTime.replace(":", "") + "00";
+
+  const dates = `${datePrefix}T${start}/${datePrefix}T${end}`;
+  const text = encodeURIComponent(item.task);
+  const details = encodeURIComponent("Scheduled by Wacky Calendar 🎲");
+
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dates}&details=${details}`;
 }

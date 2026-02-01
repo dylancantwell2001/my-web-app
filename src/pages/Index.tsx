@@ -7,9 +7,11 @@ import ScheduleDisplay, { type ScheduleItem } from "@/components/ScheduleDisplay
 import { generateSchedule, downloadICS } from "@/lib/scheduleGenerator";
 import { toast } from "sonner";
 
+import About from "@/components/About";
+
 const Index = () => {
   // Calculate dynamic default times based on current time
-  const getDefaultTimes = () => {
+  const getDefaultWindows = () => {
     const now = new Date();
     const currentHour = now.getHours();
     const currentMinutes = now.getMinutes();
@@ -17,19 +19,16 @@ const Index = () => {
     // Round to nearest 30 minutes
     const roundedMinutes = currentMinutes < 30 ? "00" : "30";
     const startHour = currentMinutes < 30 ? currentHour : currentHour + 1;
-
-    // Calculate end time (1 hour ahead)
     const endHour = startHour + 1;
 
-    return {
-      start: `${startHour.toString().padStart(2, "0")}:${roundedMinutes}`,
-      end: `${endHour.toString().padStart(2, "0")}:${roundedMinutes}`
-    };
+    return [{
+      id: "default",
+      startTime: `${startHour.toString().padStart(2, "0")}:${roundedMinutes}`,
+      endTime: `${endHour.toString().padStart(2, "0")}:${roundedMinutes}`
+    }];
   };
 
-  const defaultTimes = getDefaultTimes();
-  const [startTime, setStartTime] = useState(defaultTimes.start);
-  const [endTime, setEndTime] = useState(defaultTimes.end);
+  const [timeWindows, setTimeWindows] = useState(getDefaultWindows());
   const [tasks, setTasks] = useState<Task[]>([]);
   const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
   const [isShuffling, setIsShuffling] = useState(false);
@@ -40,23 +39,28 @@ const Index = () => {
       return;
     }
 
-    const startMinutes = parseInt(startTime.split(":")[0]) * 60 + parseInt(startTime.split(":")[1]);
-    const endMinutes = parseInt(endTime.split(":")[0]) * 60 + parseInt(endTime.split(":")[1]);
+    // Validate all windows
+    let totalAvailableMinutes = 0;
 
-    if (endMinutes <= startMinutes) {
-      toast.error("End time must be after start time!");
-      return;
+    for (const window of timeWindows) {
+      const startMinutes = parseInt(window.startTime.split(":")[0]) * 60 + parseInt(window.startTime.split(":")[1]);
+      const endMinutes = parseInt(window.endTime.split(":")[0]) * 60 + parseInt(window.endTime.split(":")[1]);
+
+      if (endMinutes <= startMinutes) {
+        toast.error("End time must be after start time for all windows!");
+        return;
+      }
+      totalAvailableMinutes += (endMinutes - startMinutes);
     }
 
-    // Calculate total task duration and available time
+    // Calculate total task duration
     const totalTaskDuration = tasks.reduce((sum, task) => sum + task.duration, 0);
-    const availableTime = endMinutes - startMinutes;
 
-    if (totalTaskDuration > availableTime) {
+    if (totalTaskDuration > totalAvailableMinutes) {
       const hoursNeeded = Math.floor(totalTaskDuration / 60);
       const minutesNeeded = totalTaskDuration % 60;
-      const hoursAvailable = Math.floor(availableTime / 60);
-      const minutesAvailable = availableTime % 60;
+      const hoursAvailable = Math.floor(totalAvailableMinutes / 60);
+      const minutesAvailable = totalAvailableMinutes % 60;
 
       toast.error(
         `Tasks are too long! You need ${hoursNeeded}h ${minutesNeeded}m but only have ${hoursAvailable}h ${minutesAvailable}m available.`
@@ -68,12 +72,12 @@ const Index = () => {
 
     // Add a small delay for the animation effect
     setTimeout(() => {
-      const newSchedule = generateSchedule(tasks, startTime, endTime);
+      const newSchedule = generateSchedule(tasks, timeWindows);
       setSchedule(newSchedule);
       setIsShuffling(false);
       toast.success("Your wacky schedule is ready! 🎲");
     }, 600);
-  }, [tasks, startTime, endTime]);
+  }, [tasks, timeWindows]);
 
   const handleExport = useCallback(() => {
     if (schedule.length === 0) return;
@@ -86,27 +90,26 @@ const Index = () => {
 
     setIsShuffling(true);
     setTimeout(() => {
-      const newSchedule = generateSchedule(tasks, startTime, endTime);
+      const newSchedule = generateSchedule(tasks, timeWindows);
       setSchedule(newSchedule);
       setIsShuffling(false);
       toast.success("Schedule reshuffled! 🎲");
     }, 600);
-  }, [tasks, startTime, endTime]);
+  }, [tasks, timeWindows]);
 
   const canShuffle = tasks.length > 0;
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       <WavyBackground />
+      <About />
 
       <div className="main-content min-h-screen flex flex-col justify-center py-12 px-6">
         <div className="max-w-2xl mx-auto w-full space-y-10">
 
           <TimeWindowPicker
-            startTime={startTime}
-            endTime={endTime}
-            onStartTimeChange={setStartTime}
-            onEndTimeChange={setEndTime}
+            windows={timeWindows}
+            onWindowsChange={setTimeWindows}
           />
 
           <TaskManager tasks={tasks} onTasksChange={setTasks} />

@@ -1,5 +1,6 @@
 import { Download, Copy } from "lucide-react";
 import { toast } from "sonner";
+import GoogleCalendarButton from "./GoogleCalendarButton";
 
 export interface ScheduleItem {
   task: string;
@@ -47,18 +48,18 @@ const ScheduleDisplay = ({ schedule, onExport }: ScheduleDisplayProps) => {
         {schedule.map((item, index) => (
           <li
             key={index}
-            className="schedule-item flex gap-3"
+            className="schedule-item flex gap-4 items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-full py-3 px-6 shadow-sm hover:bg-white/10 transition-colors"
             style={{ animationDelay: `${index * 100}ms` }}
           >
-            <span className="text-primary/60 text-lg font-semibold min-w-[2rem]">
+            <span className="text-primary/70 text-lg font-bold min-w-[1.5rem]">
               {index + 1}.
             </span>
-            <div className="flex-1">
-              <span className="task-item text-xl sm:text-2xl text-primary block">
+            <div className="flex-1 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+              <span className="task-item text-xl sm:text-2xl text-primary font-medium truncate">
                 {item.task}
               </span>
-              <span className="conversational-text text-base text-muted-foreground">
-                {formatTimeDisplay(item.startTime)} – {formatTimeDisplay(item.endTime)} ({item.duration} mins)
+              <span className="conversational-text text-sm sm:text-base text-muted-foreground whitespace-nowrap">
+                {formatTimeDisplay(item.startTime)} – {formatTimeDisplay(item.endTime)}
               </span>
             </div>
           </li>
@@ -69,7 +70,7 @@ const ScheduleDisplay = ({ schedule, onExport }: ScheduleDisplayProps) => {
       <div className="flex flex-wrap items-center justify-center gap-4">
         <button
           onClick={copyToClipboard}
-          className="inline-flex items-center gap-2 conversational-text text-base text-primary/70 hover:text-primary transition-colors underline underline-offset-4"
+          className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-primary/80 hover:text-primary conversational-text"
         >
           <Copy className="w-4 h-4" />
           Copy
@@ -77,11 +78,15 @@ const ScheduleDisplay = ({ schedule, onExport }: ScheduleDisplayProps) => {
 
         <button
           onClick={onExport}
-          className="inline-flex items-center gap-2 conversational-text text-base text-primary/70 hover:text-primary transition-colors underline underline-offset-4"
+          className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-primary/80 hover:text-primary conversational-text"
         >
           <Download className="w-4 h-4" />
-          Download
+          Download ICS
         </button>
+
+
+
+        <GoogleCalendarButton schedule={schedule} />
       </div>
     </div>
   );

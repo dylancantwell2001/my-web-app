@@ -114,11 +114,11 @@ const TaskManager = ({ tasks, onTasksChange }: TaskManagerProps) => {
       {/* Task list */}
       {tasks.length > 0 && (
         <div className="flex justify-center">
-          <ul className="space-y-2 inline-block">
+          <ul className="space-y-2 flex flex-col items-center">
             {tasks.map((task, index) => (
               <li
                 key={index}
-                className="flex items-center gap-3 group animate-fade-in"
+                className="relative flex items-center gap-3 group animate-fade-in"
               >
                 <span className="text-primary text-2xl">•</span>
 
@@ -160,20 +160,22 @@ const TaskManager = ({ tasks, onTasksChange }: TaskManagerProps) => {
                     <span className="task-item text-xl sm:text-2xl text-primary">
                       {task.name} ~{task.duration} mins.
                     </span>
-                    <button
-                      onClick={() => startEditing(index)}
-                      className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary transition-all"
-                      aria-label={`Edit ${task.name}`}
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => removeTask(index)}
-                      className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all"
-                      aria-label={`Remove ${task.name}`}
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
+                    <div className="absolute left-full top-1/2 -translate-y-1/2 pl-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => startEditing(index)}
+                        className="text-muted-foreground hover:text-primary transition-colors"
+                        aria-label={`Edit ${task.name}`}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => removeTask(index)}
+                        className="text-muted-foreground hover:text-destructive transition-colors"
+                        aria-label={`Remove ${task.name}`}
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
                   </>
                 )}
               </li>
@@ -186,8 +188,9 @@ const TaskManager = ({ tasks, onTasksChange }: TaskManagerProps) => {
       {tasks.length > 0 && (
         <button
           onClick={clearAllTasks}
-          className="text-sm text-primary/60 hover:text-primary transition-colors underline underline-offset-2"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-muted-foreground hover:text-destructive text-sm"
         >
+          <X className="w-4 h-4" />
           Clear all
         </button>
       )}
