@@ -105,31 +105,31 @@ const TimeWindowPicker = ({
         {windows.map((window, index) => (
           <div key={window.id} className="relative group/window animate-fade-in flex flex-col items-center">
 
-            <div className="flex items-center justify-center gap-3 flex-wrap relative z-10">
+            <div className="flex items-center justify-center gap-3 flex-wrap relative z-10 w-full max-w-4xl mx-auto px-12">
               {/* Start Time */}
-              <div className="flex items-center gap-2">
-                {/* Preset Buttons (only for first window) */}
+              <div className="relative">
+                {/* Preset Buttons (absolute positioned to left of start time) */}
                 {index === 0 && (
-                  <div className="flex flex-col gap-1 mr-2">
+                  <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
                     <button
                       onClick={() => {
                         const updatedWindows = windows.map(w => w.id === window.id ? { ...w, startTime: "09:00", endTime: "12:00" } : w);
                         onWindowsChange(updatedWindows);
                       }}
-                      className="p-1.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all group/preset"
+                      className="p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all group/preset"
                       title="Morning (9am - 12pm)"
                     >
-                      <Sunrise className="w-4 h-4 text-primary/40 group-hover/preset:text-primary transition-colors" />
+                      <Sunrise className="w-5 h-5 text-primary/40 group-hover/preset:text-primary transition-colors" />
                     </button>
                     <button
                       onClick={() => {
                         const updatedWindows = windows.map(w => w.id === window.id ? { ...w, startTime: "09:00", endTime: "17:00" } : w);
                         onWindowsChange(updatedWindows);
                       }}
-                      className="p-1.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all group/preset"
+                      className="p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all group/preset"
                       title="Workday (9am - 5pm)"
                     >
-                      <Sun className="w-4 h-4 text-primary/40 group-hover/preset:text-primary transition-colors" />
+                      <Sun className="w-5 h-5 text-primary/40 group-hover/preset:text-primary transition-colors" />
                     </button>
                   </div>
                 )}
@@ -200,19 +200,17 @@ const TimeWindowPicker = ({
                     </div>
                   </>
                 )}
+                {/* Add Time Button (only for last window) */}
+                {index === windows.length - 1 && windows.length < 3 && (
+                  <button
+                    onClick={addWindow}
+                    className="absolute left-full ml-4 top-1/2 -translate-y-1/2 group/add p-3 rounded-full backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-center"
+                    aria-label="Add time window"
+                  >
+                    <Plus className="w-5 h-5 text-primary/70 group-hover/add:text-primary transition-colors" />
+                  </button>
+                )}
               </div>
-
-
-              {/* Add Time Button (only for last window) */}
-              {index === windows.length - 1 && windows.length < 3 && (
-                <button
-                  onClick={addWindow}
-                  className="absolute left-full ml-4 top-1/2 -translate-y-1/2 group/add p-3 rounded-full backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-center"
-                  aria-label="Add time window"
-                >
-                  <Plus className="w-5 h-5 text-primary/70 group-hover/add:text-primary transition-colors" />
-                </button>
-              )}
             </div>
 
             {/* Remove Button (only if > 1 window) */}

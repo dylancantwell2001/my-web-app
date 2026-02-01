@@ -1,0 +1,8 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#1C1917"/>
+  <circle cx="600" cy="315" r="500" fill="#EA580C" fill-opacity="0.2"/>
+  <circle cx="200" cy="100" r="300" fill="#3B82F6" fill-opacity="0.2"/>
+  <text x="600" y="280" font-family="serif" font-style="italic" font-weight="bold" font-size="80" fill="#FDBA74" text-anchor="middle">Wacky Calendar</text>
+  <text x="600" y="380" font-family="sans-serif" font-size="40" fill="#E5E7EB" text-anchor="middle">Make Your Schedule Interesting</text>
+  <path d="M500 450 L700 450" stroke="#FDBA74" stroke-width="4"/>
+</svg>

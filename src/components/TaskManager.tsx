@@ -179,16 +179,17 @@ const TaskManager = ({ tasks, onTasksChange }: TaskManagerProps) => {
                           <div className="fixed inset-0 z-20 cursor-default" onClick={() => setActiveDropdown(null)} />
                           <div
                             ref={dropdownRef}
-                            className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-30 w-32 max-h-48 overflow-y-auto rounded-xl backdrop-blur-xl bg-[#1a1a1a] border border-white/20 shadow-2xl"
+                            className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-30 w-32 max-h-48 overflow-y-auto rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl"
                           >
                             {durationOptions.map((mins) => (
                               <button
                                 key={mins}
+                                autoFocus={mins === editingDuration}
                                 onClick={() => {
                                   setEditingDuration(mins);
                                   setActiveDropdown(null);
                                 }}
-                                className={`w-full px-3 py-2 text-center text-sm hover:bg-white/10 transition-colors ${mins === editingDuration ? "bg-white/10 text-primary font-semibold" : "text-foreground"
+                                className={`w-full px-3 py-2 text-center text-sm hover:bg-white/20 transition-colors first:rounded-t-2xl last:rounded-b-2xl focus:outline-none focus:bg-white/20 ${mins === editingDuration ? "bg-white/30 text-primary font-semibold" : "text-foreground"
                                   }`}
                               >
                                 {mins} mins
@@ -282,16 +283,17 @@ const TaskManager = ({ tasks, onTasksChange }: TaskManagerProps) => {
                 <div className="fixed inset-0 z-20 cursor-default" onClick={() => setActiveDropdown(null)} />
                 <div
                   ref={dropdownRef}
-                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-30 w-32 max-h-60 overflow-y-auto rounded-xl backdrop-blur-xl bg-[#1a1a1a] border border-white/20 shadow-2xl"
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-30 w-32 max-h-60 overflow-y-auto rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl"
                 >
                   {durationOptions.map((mins) => (
                     <button
                       key={mins}
+                      autoFocus={mins === newTaskDuration}
                       onClick={() => {
                         setNewTaskDuration(mins);
                         setActiveDropdown(null);
                       }}
-                      className={`w-full px-3 py-2 text-center text-sm hover:bg-white/10 transition-colors ${mins === newTaskDuration ? "bg-white/10 text-primary font-semibold" : "text-foreground"
+                      className={`w-full px-3 py-2 text-center text-sm hover:bg-white/20 transition-colors first:rounded-t-2xl last:rounded-b-2xl focus:outline-none focus:bg-white/20 ${mins === newTaskDuration ? "bg-white/30 text-primary font-semibold" : "text-foreground"
                         }`}
                     >
                       {mins} mins

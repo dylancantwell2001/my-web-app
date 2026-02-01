@@ -1,8 +1,28 @@
 import { useState } from "react";
-import { Info, X } from "lucide-react";
+import { Info, X, Share2 } from "lucide-react";
+import { toast } from "sonner";
 
 const About = () => {
     const [isOpen, setIsOpen] = useState(false);
+
+    const handleShare = async () => {
+        const shareData = {
+            title: 'Wacky Calendar',
+            text: 'Break the monotony of routine. Create a fresh, productive schedule in seconds.',
+            url: window.location.href,
+        };
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(window.location.href);
+                toast.success("Link copied to clipboard!");
+            }
+        } catch (err) {
+            console.error('Error sharing:', err);
+        }
+    };
 
     return (
         <>
@@ -36,16 +56,26 @@ const About = () => {
                                     "As we age, we create routines to keep ourselves efficient, but with routine, days blend together so our minds let go of them. This allows us to stay productive but keep days feeling fresh. Make your schedule interesting."
                                 </p>
 
-                                <div className="pt-4 border-t border-white/10">
-                                    <p className="text-muted-foreground text-sm mb-2">Designed by</p>
-                                    <a
-                                        href="https://dylancantwell.com"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-primary hover:text-primary/80 transition-colors font-medium text-lg inline-flex items-center gap-1 hover:underline underline-offset-4"
+                                <div className="pt-4 border-t border-white/10 space-y-4">
+                                    <div>
+                                        <p className="text-muted-foreground text-sm mb-2">Designed by</p>
+                                        <a
+                                            href="https://dylancantwell.com"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-primary hover:text-primary/80 transition-colors font-medium text-lg inline-flex items-center gap-1 hover:underline underline-offset-4"
+                                        >
+                                            Dylan Cantwell
+                                        </a>
+                                    </div>
+
+                                    <button
+                                        onClick={handleShare}
+                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-foreground/80 hover:text-primary text-sm font-medium"
                                     >
-                                        Dylan Cantwell
-                                    </a>
+                                        <Share2 className="w-4 h-4" />
+                                        Share this app
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -55,5 +85,6 @@ const About = () => {
         </>
     );
 };
+
 
 export default About;
