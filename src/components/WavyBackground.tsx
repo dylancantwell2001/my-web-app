@@ -42,17 +42,30 @@ const WavyBackground = () => {
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
-      <button
-        onClick={() => setIsBlurred(!isBlurred)}
-        className="fixed bottom-4 left-4 z-50 p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-primary/70 hover:text-primary backdrop-blur-md pointer-events-auto"
-        title={isBlurred ? "Remove blur" : "Enable blur"}
-      >
-        {isBlurred ? (
-          <Eye className="w-5 h-5" />
-        ) : (
-          <EyeOff className="w-5 h-5" />
+      <div className="fixed bottom-4 left-4 z-50 flex items-center gap-3 pointer-events-auto">
+        <button
+          onClick={() => setIsBlurred(!isBlurred)}
+          className="p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-primary/70 hover:text-primary backdrop-blur-md"
+          title={isBlurred ? "Remove blur" : "Enable blur"}
+        >
+          {isBlurred ? (
+            <Eye className="w-5 h-5" />
+          ) : (
+            <EyeOff className="w-5 h-5" />
+          )}
+        </button>
+
+        {!isBlurred && (
+          <a
+            href="https://dylancantwell.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-xs text-primary/70 hover:text-primary backdrop-blur-md animate-fade-in"
+          >
+            Photo by Dylan Cantwell
+          </a>
         )}
-      </button>
+      </div>
     </>
   );
 };

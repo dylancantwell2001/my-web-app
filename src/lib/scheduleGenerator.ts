@@ -110,10 +110,13 @@ export function generateICS(schedule: ScheduleItem[]): string {
     const endTimeFormatted = item.endTime.replace(":", "") + "00";
     const uid = `${dateStr}-${item.startTime}-${Math.random().toString(36).substr(2, 9)}@wackycalendar`;
 
+    // Sanitize summary to be safe for ICS (remove newlines, etc)
+    const safeSummary = item.task.replace(/[\r\n]+/g, " ").replace(/[\\;,]/g, "");
+
     return `BEGIN:VEVENT
 DTSTART:${dateStr}T${startTimeFormatted}
 DTEND:${dateStr}T${endTimeFormatted}
-SUMMARY:${item.task}
+SUMMARY:${safeSummary}
 DESCRIPTION:Scheduled by Wacky Calendar 🎲
 UID:${uid}
 END:VEVENT`;

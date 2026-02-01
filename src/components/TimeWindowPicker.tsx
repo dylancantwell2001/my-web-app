@@ -108,29 +108,31 @@ const TimeWindowPicker = ({
             <div className="flex items-center justify-center gap-3 flex-wrap relative z-10">
               {/* Start Time */}
               <div className="flex items-center gap-2">
-                {/* Preset Buttons */}
-                <div className="flex flex-col gap-1 mr-2">
-                  <button
-                    onClick={() => {
-                      const updatedWindows = windows.map(w => w.id === window.id ? { ...w, startTime: "09:00", endTime: "12:00" } : w);
-                      onWindowsChange(updatedWindows);
-                    }}
-                    className="p-1.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all group/preset"
-                    title="Morning (9am - 12pm)"
-                  >
-                    <Sunrise className="w-4 h-4 text-primary/40 group-hover/preset:text-primary transition-colors" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      const updatedWindows = windows.map(w => w.id === window.id ? { ...w, startTime: "09:00", endTime: "17:00" } : w);
-                      onWindowsChange(updatedWindows);
-                    }}
-                    className="p-1.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all group/preset"
-                    title="Workday (9am - 5pm)"
-                  >
-                    <Sun className="w-4 h-4 text-primary/40 group-hover/preset:text-primary transition-colors" />
-                  </button>
-                </div>
+                {/* Preset Buttons (only for first window) */}
+                {index === 0 && (
+                  <div className="flex flex-col gap-1 mr-2">
+                    <button
+                      onClick={() => {
+                        const updatedWindows = windows.map(w => w.id === window.id ? { ...w, startTime: "09:00", endTime: "12:00" } : w);
+                        onWindowsChange(updatedWindows);
+                      }}
+                      className="p-1.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all group/preset"
+                      title="Morning (9am - 12pm)"
+                    >
+                      <Sunrise className="w-4 h-4 text-primary/40 group-hover/preset:text-primary transition-colors" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        const updatedWindows = windows.map(w => w.id === window.id ? { ...w, startTime: "09:00", endTime: "17:00" } : w);
+                        onWindowsChange(updatedWindows);
+                      }}
+                      className="p-1.5 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all group/preset"
+                      title="Workday (9am - 5pm)"
+                    >
+                      <Sun className="w-4 h-4 text-primary/40 group-hover/preset:text-primary transition-colors" />
+                    </button>
+                  </div>
+                )}
 
                 <div className="relative inline-block">
                   <button

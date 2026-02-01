@@ -42,6 +42,24 @@ const Index = () => {
     // Validate all windows
     let totalAvailableMinutes = 0;
 
+    // Check for overlaps
+    const sortedWindows = [...timeWindows].sort((a, b) => {
+      const startA = parseInt(a.startTime.split(":")[0]) * 60 + parseInt(a.startTime.split(":")[1]);
+      const startB = parseInt(b.startTime.split(":")[0]) * 60 + parseInt(b.startTime.split(":")[1]);
+      return startA - startB;
+    });
+
+    for (let i = 0; i < sortedWindows.length - 1; i++) {
+      const currentEnd = parseInt(sortedWindows[i].endTime.split(":")[0]) * 60 + parseInt(sortedWindows[i].endTime.split(":")[1]);
+      const nextStart = parseInt(sortedWindows[i + 1].startTime.split(":")[0]) * 60 + parseInt(sortedWindows[i + 1].startTime.split(":")[1]);
+
+      if (nextStart < currentEnd) {
+        toast.error("Time windows cannot overlap! Please adjust your times.");
+        return;
+      }
+    }
+
+    // Calculate total totalAvailableMinutes (non-overlapping is guaranteed now)
     for (const window of timeWindows) {
       const startMinutes = parseInt(window.startTime.split(":")[0]) * 60 + parseInt(window.startTime.split(":")[1]);
       const endMinutes = parseInt(window.endTime.split(":")[0]) * 60 + parseInt(window.endTime.split(":")[1]);
